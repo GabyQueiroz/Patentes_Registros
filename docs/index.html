@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recomendações de complementaridades tecnológicas</title>
+  <style>
+    :root {
+      --ink: #1f2d2f;
+      --muted: #5c676a;
+      --line: #d8dddf;
+      --paper: #fbfbf9;
+      --panel: #ffffff;
+      --blue: #2f5d73;
+      --green: #6f927f;
+      --tan: #a98467;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.45;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      padding: 28px 32px 22px;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+    }
+
+    h1 {
+      max-width: 1040px;
+      margin: 0 0 10px;
+      font-size: clamp(1.55rem, 2.6vw, 2.35rem);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 28px 0 14px;
+      font-size: 1.25rem;
+    }
+
+    p {
+      max-width: 980px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.45rem;
+      color: var(--blue);
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0 18px;
+    }
+
+    input, select, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 11px;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    figure {
+      margin: 0;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 10px;
+    }
+
+    figure.wide { grid-column: 1 / -1; }
+
+    figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    figcaption {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1120px;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f3f5f4;
+      text-align: left;
+      z-index: 1;
+    }
+
+    td.score {
+      font-weight: 700;
+      color: var(--blue);
+      white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      padding: 2px 7px;
+      margin: 0 4px 4px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      background: #fafafa;
+    }
+
+    .note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 900px) {
+      header { padding: 22px 18px; }
+      main { padding: 18px; }
+      .summary, .filters, .figure-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Recomendações de complementaridades tecnológicas entre patentes e programas de computador</h1>
+    <p>
+      Painel de consulta dos pares patente-software gerados pelo experimento com
+      microdados BADEPI 11.0. As recomendações indicam complementaridades potenciais,
+      não transferência tecnológica realizada.
+    </p>
+  </header>
+
+  <main>
+    <section class="summary" aria-label="Resumo do experimento">
+      <div class="metric"><strong>8.043</strong><span>ativos de ICTs</span></div>
+      <div class="metric"><strong>493</strong><span>patentes</span></div>
+      <div class="metric"><strong>7.550</strong><span>programas de computador</span></div>
+      <div class="metric"><strong>12.799</strong><span>pares candidatos</span></div>
+      <div class="metric"><strong>0,903</strong><span>Average Precision</span></div>
+    </section>
+
+    <section>
+      <h2>Tabela de Recomendações</h2>
+      <p>
+        Cada linha apresenta uma patente, um programa de computador e os indicadores
+        usados para ranquear a complementaridade: escore composto, similaridade textual,
+        área, tópico, vínculo institucional e distância temporal.
+      </p>
+
+      <div class="filters">
+        <input id="q" type="search" placeholder="Buscar por título, ICT, área ou número do pedido">
+        <select id="area">
+          <option value="">Todas as áreas</option>
+        </select>
+        <select id="ict">
+          <option value="">Todas as ICTs</option>
+        </select>
+        <button id="clear" type="button">Limpar filtros</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Escore</th>
+              <th>Patente</th>
+              <th>Programa de computador</th>
+              <th>ICT da patente</th>
+              <th>ICT do software</th>
+              <th>Área</th>
+              <th>Indicadores</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="note" id="count"></p>
+    </section>
+
+    <section>
+      <h2>Figuras do Experimento</h2>
+      <div class="figure-grid">
+        <figure class="wide">
+          <img src="fig_01_evolucao_anual.png" alt="Evolução anual dos ativos">
+          <figcaption>Evolução anual dos ativos de ICTs identificados.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig_02_areas_lexicas.png" alt="Áreas de aplicação inferidas">
+          <figcaption>Áreas de aplicação inferidas por léxico tecnológico.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig_03_metricas_modelos.png" alt="Métricas dos modelos">
+          <figcaption>Desempenho dos melhores modelos por Average Precision.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig_04_distribuicao_scores.png" alt="Distribuição dos escores">
+          <figcaption>Distribuição dos escores compostos de recomendação.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig_05_rede_recomendacoes.png" alt="Rede de recomendações">
+          <figcaption>Rede das principais complementaridades recomendadas.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = { data: [], filtered: [] };
+    const rowsEl = document.getElementById("rows");
+    const countEl = document.getElementById("count");
+    const qEl = document.getElementById("q");
+    const areaEl = document.getElementById("area");
+    const ictEl = document.getElementById("ict");
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = "", quoted = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i], next = text[i + 1];
+        if (ch === '"' && quoted && next === '"') {
+          field += '"';
+          i++;
+        } else if (ch === '"') {
+          quoted = !quoted;
+        } else if (ch === "," && !quoted) {
+          row.push(field);
+          field = "";
+        } else if ((ch === "\n" || ch === "\r") && !quoted) {
+          if (field || row.length) {
+            row.push(field);
+            rows.push(row);
+            row = [];
+            field = "";
+          }
+          if (ch === "\r" && next === "\n") i++;
+        } else {
+          field += ch;
+        }
+      }
+      if (field || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+      const header = rows.shift();
+      return rows.map(values => Object.fromEntries(header.map((h, i) => [h, values[i] || ""])));
+    }
+
+    function fmtNumber(value, digits = 3) {
+      const n = Number(String(value).replace(",", "."));
+      return Number.isFinite(n) ? n.toFixed(digits).replace(".", ",") : "";
+    }
+
+    function normalize(value) {
+      return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function populateFilters() {
+      const areas = [...new Set(state.data.map(d => d.patente_area_lexica).filter(Boolean))].sort();
+      const icts = [...new Set([
+        ...state.data.map(d => d.patente_depositante),
+        ...state.data.map(d => d.software_depositante)
+      ].filter(Boolean))].sort((a, b) => a.localeCompare(b));
+
+      for (const area of areas) {
+        const opt = document.createElement("option");
+        opt.value = area;
+        opt.textContent = area.replaceAll("_", " ");
+        areaEl.appendChild(opt);
+      }
+
+      for (const ict of icts.slice(0, 250)) {
+        const opt = document.createElement("option");
+        opt.value = ict;
+        opt.textContent = ict;
+        ictEl.appendChild(opt);
+      }
+    }
+
+    function applyFilters() {
+      const q = normalize(qEl.value);
+      const area = areaEl.value;
+      const ict = ictEl.value;
+
+      state.filtered = state.data.filter(d => {
+        const haystack = normalize([
+          d.patente_NO_PEDIDO,
+          d.software_NO_PEDIDO,
+          d.patente_titulo,
+          d.software_titulo,
+          d.patente_depositante,
+          d.software_depositante,
+          d.patente_area_lexica,
+          d.software_area_lexica
+        ].join(" "));
+        const matchQ = !q || haystack.includes(q);
+        const matchArea = !area || d.patente_area_lexica === area || d.software_area_lexica === area;
+        const matchIct = !ict || d.patente_depositante === ict || d.software_depositante === ict;
+        return matchQ && matchArea && matchIct;
+      });
+
+      renderRows();
+    }
+
+    function renderRows() {
+      const fragment = document.createDocumentFragment();
+      rowsEl.innerHTML = "";
+      for (const d of state.filtered.slice(0, 150)) {
+        const tr = document.createElement("tr");
+        const indicators = [
+          `modelo: ${fmtNumber(d.score_modelo)}`,
+          `cosseno: ${fmtNumber(d.cosine)}`,
+          `jaccard: ${fmtNumber(d.jaccard_texto)}`,
+          d.mesma_ict === "1" ? "mesma ICT" : "ICTs distintas",
+          d.mesmo_topico === "1" ? "mesmo tópico" : "tópicos distintos",
+          `anos: ${fmtNumber(d.dist_ano, 0)}`
+        ];
+        tr.innerHTML = `
+          <td class="score">${fmtNumber(d.score_recomendacao)}</td>
+          <td><strong>${d.patente_NO_PEDIDO.trim()}</strong><br>${d.patente_titulo}</td>
+          <td><strong>${d.software_NO_PEDIDO.trim()}</strong><br>${d.software_titulo}</td>
+          <td>${d.patente_depositante}</td>
+          <td>${d.software_depositante}</td>
+          <td>${(d.patente_area_lexica || "").replaceAll("_", " ")}<br>${(d.software_area_lexica || "").replaceAll("_", " ")}</td>
+          <td>${indicators.map(x => `<span class="pill">${x}</span>`).join("")}</td>
+        `;
+        fragment.appendChild(tr);
+      }
+      rowsEl.appendChild(fragment);
+      countEl.textContent = `${state.filtered.length} recomendações encontradas. Exibindo até 150 linhas para manter a página leve.`;
+    }
+
+    fetch("recomendacoes_topk.csv")
+      .then(r => r.text())
+      .then(text => {
+        state.data = parseCSV(text).sort((a, b) => Number(b.score_recomendacao) - Number(a.score_recomendacao));
+        populateFilters();
+        applyFilters();
+      });
+
+    [qEl, areaEl, ictEl].forEach(el => el.addEventListener("input", applyFilters));
+    document.getElementById("clear").addEventListener("click", () => {
+      qEl.value = "";
+      areaEl.value = "";
+      ictEl.value = "";
+      applyFilters();
+    });
+  </script>
+</body>
+</html>

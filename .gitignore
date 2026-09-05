@@ -11,6 +11,10 @@ recomendacao_icts/resultados/
 *.pkl
 *.png
 
+# Interface publica com resultados selecionados
+!docs/
+!docs/**
+
 # Python
 __pycache__/
 *.py[cod]
@@ -22,4 +26,3 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
-
