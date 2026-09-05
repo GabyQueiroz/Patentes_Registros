@@ -1,0 +1,25 @@
+# Dados brutos e arquivos grandes
+*.zip
+*.7z
+*.rar
+*.csv
+*.xlsx
+
+# Saidas do experimento
+recomendacao_icts/resultados/
+*.joblib
+*.pkl
+*.png
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Sistema operacional e editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
