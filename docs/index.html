@@ -55,6 +55,16 @@
     .detail { min-height: 560px; padding: 16px; background: #fff; border: 1px solid var(--line); }
     .legend { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0 0; color: var(--muted); font-size: 0.92rem; }
     .dot { display: inline-block; width: 11px; height: 11px; border-radius: 999px; margin-right: 5px; vertical-align: -1px; }
+    .map-controls { display: grid; grid-template-columns: 1.4fr 0.7fr 0.7fr 0.7fr; gap: 10px; margin: 14px 0 0; }
+    .map-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .map-actions button { padding: 8px 10px; }
+    .node-label { font-family: Georgia, "Times New Roman", serif; pointer-events: none; }
+    .node-circle, .edge-line { cursor: pointer; transition: opacity 0.15s ease, stroke-width 0.15s ease; }
+    .edge-line.active { opacity: 0.95; stroke: #2f5d73; }
+    .node-circle.active { stroke: #111; stroke-width: 3; }
+    .connection-list { margin-top: 14px; display: grid; gap: 10px; }
+    .connection-item { border-top: 1px solid var(--line); padding-top: 10px; }
+    .connection-item button { margin-top: 8px; width: auto; padding: 7px 10px; font-size: 0.85rem; }
     .table-wrap { overflow: auto; background: #fff; border: 1px solid var(--line); margin-top: 14px; }
     table { width: 100%; border-collapse: collapse; min-width: 1180px; font-size: 0.9rem; }
     th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; vertical-align: top; }
@@ -116,18 +126,34 @@
     </section>
 
     <section>
-      <h2>Rede interativa das principais recomendações</h2>
-      <p>Patentes aparecem em azul escuro e softwares em marrom. Clique em uma linha para identificar o par e ver os indicadores da complementaridade. A linha mais espessa indica maior escore.</p>
+      <h2>Mapa interativo das recomendações</h2>
+      <p>Patentes aparecem em azul escuro e softwares em marrom. Clique em uma bolinha para ver o ativo e suas conexões. Clique em uma linha para ver a complementaridade daquele par. A quantidade de ligações exibidas pode ser ampliada sem alterar os dados do experimento.</p>
       <div class="legend">
         <span><i class="dot" style="background: var(--patent)"></i>Patente</span>
         <span><i class="dot" style="background: var(--software)"></i>Programa de computador</span>
         <span>Linha mais espessa = maior escore</span>
       </div>
+      <div class="map-controls">
+        <input id="nodeSearch" type="search" placeholder="Buscar nó por patente, software, título ou ICT">
+        <select id="linkLimit">
+          <option value="36">36 conexões</option>
+          <option value="75" selected>75 conexões</option>
+          <option value="150">150 conexões</option>
+          <option value="500">Todas do CSV</option>
+        </select>
+        <button id="focusNode" type="button">Focar nó</button>
+        <button id="resetMap" type="button">Resetar mapa</button>
+      </div>
       <div class="network-layout">
         <svg id="network" role="img" aria-label="Rede interativa de recomendações"></svg>
         <aside class="detail" id="networkDetail">
           <h3>Detalhe da recomendação</h3>
-          <p>Clique em uma ligação da rede para ver a patente, o software e os indicadores usados na recomendação.</p>
+          <p>Clique em uma bolinha para ver o ativo e as recomendações conectadas a ele, ou clique em uma linha para ver o par patente--software.</p>
+          <div class="map-actions">
+            <button id="zoomIn" type="button">Aproximar</button>
+            <button id="zoomOut" type="button">Afastar</button>
+            <button id="showTop" type="button">Top pares</button>
+          </div>
         </aside>
       </div>
     </section>
@@ -184,6 +210,14 @@
     const cardsEl = document.getElementById("recommendationCards");
     const networkEl = document.getElementById("network");
     const networkDetail = document.getElementById("networkDetail");
+    const nodeSearch = document.getElementById("nodeSearch");
+    const linkLimit = document.getElementById("linkLimit");
+    const focusNode = document.getElementById("focusNode");
+    const resetMap = document.getElementById("resetMap");
+    const zoomIn = document.getElementById("zoomIn");
+    const zoomOut = document.getElementById("zoomOut");
+    const showTop = document.getElementById("showTop");
+    const mapState = { viewBox: null, selectedNode: null, selectedLink: null, nodes: [], links: [] };
 
     function parseCSV(text) {
       const rows = [];
@@ -333,52 +367,91 @@
 
     function nodeId(prefix, value) { return `${prefix}:${String(value || "").trim()}`; }
 
-    function renderNetwork() {
-      const width = networkEl.clientWidth || 900;
-      const height = networkEl.clientHeight || 560;
-      networkEl.setAttribute("viewBox", `0 0 ${width} ${height}`);
-      networkEl.innerHTML = "";
-      const links = state.data.slice(0, 36);
+    function buildMapData() {
+      const limit = Math.min(Number(linkLimit.value), state.data.length);
+      const links = state.data.slice(0, limit);
       const nodes = new Map();
       for (const d of links) {
         const pId = nodeId("P", d.patente_NO_PEDIDO);
         const sId = nodeId("S", d.software_NO_PEDIDO);
-        if (!nodes.has(pId)) nodes.set(pId, { id: pId, type: "patente", label: d.patente_NO_PEDIDO.trim(), title: d.patente_titulo });
-        if (!nodes.has(sId)) nodes.set(sId, { id: sId, type: "software", label: d.software_NO_PEDIDO.trim(), title: d.software_titulo });
+        if (!nodes.has(pId)) nodes.set(pId, {
+          id: pId, type: "patente", label: d.patente_NO_PEDIDO.trim(),
+          title: d.patente_titulo, ict: d.patente_depositante, area: d.patente_area_lexica
+        });
+        if (!nodes.has(sId)) nodes.set(sId, {
+          id: sId, type: "software", label: d.software_NO_PEDIDO.trim(),
+          title: d.software_titulo, ict: d.software_depositante, area: d.software_area_lexica
+        });
       }
-      const nodeArray = [...nodes.values()];
-      const patentNodes = nodeArray.filter(n => n.type === "patente");
-      const softwareNodes = nodeArray.filter(n => n.type === "software");
-      patentNodes.forEach((n, i) => { n.x = width * 0.30; n.y = 42 + i * ((height - 84) / Math.max(1, patentNodes.length - 1)); });
-      softwareNodes.forEach((n, i) => { n.x = width * 0.72; n.y = 42 + i * ((height - 84) / Math.max(1, softwareNodes.length - 1)); });
-      const byId = Object.fromEntries(nodeArray.map(n => [n.id, n]));
+      const counts = {};
+      for (const d of links) {
+        counts[nodeId("P", d.patente_NO_PEDIDO)] = (counts[nodeId("P", d.patente_NO_PEDIDO)] || 0) + 1;
+        counts[nodeId("S", d.software_NO_PEDIDO)] = (counts[nodeId("S", d.software_NO_PEDIDO)] || 0) + 1;
+      }
+      const nodeArray = [...nodes.values()].map(n => ({ ...n, degree: counts[n.id] || 1 }));
+      return { links, nodes: nodeArray };
+    }
+
+    function layoutMap(nodes, width, height) {
+      const patentNodes = nodes.filter(n => n.type === "patente").sort((a, b) => b.degree - a.degree || a.label.localeCompare(b.label));
+      const softwareNodes = nodes.filter(n => n.type === "software").sort((a, b) => b.degree - a.degree || a.label.localeCompare(b.label));
+      const rowGapPatent = Math.max(32, (height - 90) / Math.max(1, patentNodes.length - 1));
+      const rowGapSoftware = Math.max(28, (height - 90) / Math.max(1, softwareNodes.length - 1));
+      patentNodes.forEach((n, i) => { n.x = width * 0.30 + ((i % 2) * 18); n.y = 45 + i * rowGapPatent; });
+      softwareNodes.forEach((n, i) => { n.x = width * 0.72 - ((i % 2) * 18); n.y = 45 + i * rowGapSoftware; });
+    }
+
+    function renderNetwork() {
+      const width = networkEl.clientWidth || 900;
+      const baseHeight = networkEl.clientHeight || 560;
+      const { links, nodes } = buildMapData();
+      const estimatedHeight = Math.max(baseHeight, Math.max(560, Math.ceil(nodes.length / 2) * 30));
+      mapState.links = links;
+      mapState.nodes = nodes;
+      layoutMap(nodes, width, estimatedHeight);
+      if (!mapState.viewBox) mapState.viewBox = { x: 0, y: 0, w: width, h: baseHeight };
+      networkEl.setAttribute("viewBox", `${mapState.viewBox.x} ${mapState.viewBox.y} ${mapState.viewBox.w} ${mapState.viewBox.h}`);
+      networkEl.innerHTML = "";
+
+      const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
       const maxScore = Math.max(...links.map(d => Number(d.score_recomendacao)));
       const minScore = Math.min(...links.map(d => Number(d.score_recomendacao)));
       for (const d of links) {
-        const p = byId[nodeId("P", d.patente_NO_PEDIDO)];
-        const s = byId[nodeId("S", d.software_NO_PEDIDO)];
+        const pId = nodeId("P", d.patente_NO_PEDIDO);
+        const sId = nodeId("S", d.software_NO_PEDIDO);
+        const p = byId[pId], s = byId[sId];
+        if (!p || !s) continue;
         const score = Number(d.score_recomendacao);
+        const active = mapState.selectedLink === d || mapState.selectedNode === pId || mapState.selectedNode === sId;
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", p.x); line.setAttribute("y1", p.y);
         line.setAttribute("x2", s.x); line.setAttribute("y2", s.y);
-        line.setAttribute("stroke", "#9fa6a8");
-        line.setAttribute("stroke-width", String(1.2 + 5 * ((score - minScore) / Math.max(0.001, maxScore - minScore))));
-        line.setAttribute("opacity", "0.55");
-        line.style.cursor = "pointer";
-        line.addEventListener("click", () => showNetworkDetail(d));
+        line.setAttribute("stroke-width", String(1.1 + 5.5 * ((score - minScore) / Math.max(0.001, maxScore - minScore))));
+        line.setAttribute("opacity", active ? "0.95" : "0.42");
+        line.setAttribute("stroke", active ? "#2f5d73" : "#a7adaf");
+        line.setAttribute("class", "edge-line" + (active ? " active" : ""));
+        line.addEventListener("click", () => { mapState.selectedLink = d; mapState.selectedNode = null; showLinkDetail(d); renderNetwork(); });
         networkEl.appendChild(line);
       }
-      for (const n of nodeArray) {
+
+      for (const n of nodes) {
+        const active = mapState.selectedNode === n.id;
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("cx", n.x); circle.setAttribute("cy", n.y); circle.setAttribute("r", "8");
+        circle.setAttribute("cx", n.x); circle.setAttribute("cy", n.y);
+        circle.setAttribute("r", String(6 + Math.min(8, n.degree)));
         circle.setAttribute("fill", n.type === "patente" ? "#183940" : "#a98467");
+        circle.setAttribute("stroke", active ? "#111" : "#fff");
+        circle.setAttribute("stroke-width", active ? "3" : "1");
+        circle.setAttribute("class", "node-circle" + (active ? " active" : ""));
+        circle.addEventListener("click", () => { mapState.selectedNode = n.id; mapState.selectedLink = null; showNodeDetail(n); renderNetwork(); });
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", n.type === "patente" ? n.x - 14 : n.x + 14);
+        text.setAttribute("x", n.type === "patente" ? n.x - 16 : n.x + 16);
         text.setAttribute("y", n.y + 4);
         text.setAttribute("text-anchor", n.type === "patente" ? "end" : "start");
         text.setAttribute("font-size", "11");
         text.setAttribute("fill", "#1f2d2f");
+        text.setAttribute("class", "node-label");
         text.textContent = n.label;
         const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
         title.textContent = `${n.type === "patente" ? "Patente" : "Software"} ${n.label}: ${n.title}`;
@@ -387,13 +460,66 @@
       }
     }
 
-    function showNetworkDetail(d) {
+    function showLinkDetail(d) {
       networkDetail.innerHTML = `
         <h3>Complementaridade recomendada</h3>
         <p><b>Patente ${d.patente_NO_PEDIDO.trim()}</b><br>${d.patente_titulo}</p>
         <p style="margin-top:12px"><b>Software ${d.software_NO_PEDIDO.trim()}</b><br>${d.software_titulo}</p>
         <p style="margin-top:12px"><b>Interpretação:</b> ${complementarityText(d)}</p>
-        <div style="margin-top:12px">${indicatorPills(d)}</div>`;
+        <div style="margin-top:12px">${indicatorPills(d)}</div>
+        <div class="map-actions">
+          <button type="button" onclick="selectPatentFromMap('${d.patente_NO_PEDIDO.trim()}')">Ver recomendações da patente</button>
+        </div>`;
+    }
+
+    function showNodeDetail(node) {
+      const connected = mapState.links.filter(d =>
+        nodeId("P", d.patente_NO_PEDIDO) === node.id || nodeId("S", d.software_NO_PEDIDO) === node.id
+      ).sort((a, b) => Number(b.score_recomendacao) - Number(a.score_recomendacao));
+      const items = connected.slice(0, 12).map(d => `
+        <div class="connection-item">
+          <b>${fmtNumber(d.score_recomendacao)}</b> -
+          Patente ${d.patente_NO_PEDIDO.trim()} ligada ao software ${d.software_NO_PEDIDO.trim()}
+          <br><span>${shortText(d.patente_titulo, 72)} | ${shortText(d.software_titulo, 72)}</span>
+          <br><button type="button" onclick="showPairFromIds('${d.patente_NO_PEDIDO.trim()}','${d.software_NO_PEDIDO.trim()}')">Ver par</button>
+        </div>`).join("");
+      networkDetail.innerHTML = `
+        <h3>${node.type === "patente" ? "Patente" : "Programa de computador"} ${node.label}</h3>
+        <p><b>${node.ict}</b></p>
+        <p style="margin-top:8px">${node.title}</p>
+        <p style="margin-top:10px"><b>Área:</b> ${areaLabel(node.area)}. <b>Conexões exibidas:</b> ${connected.length}.</p>
+        <div class="connection-list">${items || "<p>Nenhuma conexão no recorte exibido.</p>"}</div>`;
+    }
+
+    window.showPairFromIds = function(patentId, softwareId) {
+      const pair = state.data.find(d => d.patente_NO_PEDIDO.trim() === patentId && d.software_NO_PEDIDO.trim() === softwareId);
+      if (pair) { mapState.selectedLink = pair; mapState.selectedNode = null; showLinkDetail(pair); renderNetwork(); }
+    };
+
+    window.selectPatentFromMap = function(patentId) {
+      patentSelect.value = patentId;
+      renderRecommendationCards();
+      document.getElementById("recommendationCards").scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    function zoomMap(factor) {
+      const vb = mapState.viewBox;
+      const cx = vb.x + vb.w / 2, cy = vb.y + vb.h / 2;
+      vb.w *= factor; vb.h *= factor;
+      vb.x = cx - vb.w / 2; vb.y = cy - vb.h / 2;
+      renderNetwork();
+    }
+
+    function focusMapNode() {
+      const q = normalizeText(nodeSearch.value);
+      if (!q) return;
+      const found = mapState.nodes.find(n => normalizeText(`${n.label} ${n.title} ${n.ict} ${n.area}`).includes(q));
+      if (!found) return;
+      mapState.selectedNode = found.id;
+      mapState.selectedLink = null;
+      mapState.viewBox = { x: Math.max(0, found.x - 260), y: Math.max(0, found.y - 180), w: 520, h: 360 };
+      showNodeDetail(found);
+      renderNetwork();
     }
 
     fetch("recomendacoes_topk.csv")
@@ -409,6 +535,69 @@
 
     [qEl, areaEl, ictEl].forEach(el => el.addEventListener("input", applyFilters));
     [patentSelect, topN].forEach(el => el.addEventListener("input", renderRecommendationCards));
+    linkLimit.addEventListener("input", () => {
+      mapState.viewBox = null;
+      mapState.selectedNode = null;
+      mapState.selectedLink = null;
+      renderNetwork();
+    });
+    focusNode.addEventListener("click", focusMapNode);
+    nodeSearch.addEventListener("keydown", event => {
+      if (event.key === "Enter") focusMapNode();
+    });
+    resetMap.addEventListener("click", () => {
+      mapState.viewBox = null;
+      mapState.selectedNode = null;
+      mapState.selectedLink = null;
+      networkDetail.innerHTML = `
+        <h3>Detalhe da recomendação</h3>
+        <p>Clique em uma bolinha para ver o ativo e as recomendações conectadas a ele, ou clique em uma linha para ver o par patente--software.</p>
+        <div class="map-actions">
+          <button id="zoomInPanel" type="button">Aproximar</button>
+          <button id="zoomOutPanel" type="button">Afastar</button>
+          <button id="showTopPanel" type="button">Top pares</button>
+        </div>`;
+      renderNetwork();
+      document.getElementById("zoomInPanel").addEventListener("click", () => zoomMap(0.78));
+      document.getElementById("zoomOutPanel").addEventListener("click", () => zoomMap(1.28));
+      document.getElementById("showTopPanel").addEventListener("click", () => {
+        linkLimit.value = "36";
+        mapState.viewBox = null;
+        renderNetwork();
+      });
+    });
+    zoomIn.addEventListener("click", () => zoomMap(0.78));
+    zoomOut.addEventListener("click", () => zoomMap(1.28));
+    showTop.addEventListener("click", () => {
+      linkLimit.value = "36";
+      mapState.viewBox = null;
+      renderNetwork();
+    });
+    networkEl.addEventListener("wheel", event => {
+      event.preventDefault();
+      zoomMap(event.deltaY < 0 ? 0.88 : 1.12);
+    }, { passive: false });
+
+    let dragging = null;
+    networkEl.addEventListener("pointerdown", event => {
+      dragging = { x: event.clientX, y: event.clientY, viewBox: { ...mapState.viewBox } };
+      networkEl.setPointerCapture(event.pointerId);
+    });
+    networkEl.addEventListener("pointermove", event => {
+      if (!dragging) return;
+      const rect = networkEl.getBoundingClientRect();
+      const dx = (event.clientX - dragging.x) * (dragging.viewBox.w / rect.width);
+      const dy = (event.clientY - dragging.y) * (dragging.viewBox.h / rect.height);
+      mapState.viewBox = {
+        x: dragging.viewBox.x - dx,
+        y: dragging.viewBox.y - dy,
+        w: dragging.viewBox.w,
+        h: dragging.viewBox.h
+      };
+      networkEl.setAttribute("viewBox", `${mapState.viewBox.x} ${mapState.viewBox.y} ${mapState.viewBox.w} ${mapState.viewBox.h}`);
+    });
+    networkEl.addEventListener("pointerup", () => { dragging = null; });
+    networkEl.addEventListener("pointerleave", () => { dragging = null; });
     document.getElementById("clear").addEventListener("click", () => {
       qEl.value = ""; areaEl.value = ""; ictEl.value = ""; applyFilters();
     });
