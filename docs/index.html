@@ -3,204 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Recomendações de complementaridades tecnológicas</title>
+  <title>Sistema de recomendação de complementaridades tecnológicas</title>
   <style>
     :root {
       --ink: #1f2d2f;
       --muted: #5c676a;
-      --line: #d8dddf;
-      --paper: #fbfbf9;
+      --line: #d9dedc;
+      --paper: #fbfbf8;
       --panel: #ffffff;
-      --blue: #2f5d73;
-      --green: #6f927f;
-      --tan: #a98467;
+      --patent: #183940;
+      --software: #a98467;
+      --accent: #2f5d73;
+      --soft: #eef2f1;
     }
 
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font-family: Georgia, "Times New Roman", serif;
-      line-height: 1.45;
-    }
-
-    header {
-      border-bottom: 1px solid var(--line);
-      background: #fff;
-      padding: 28px 32px 22px;
-    }
-
-    main {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 24px 28px 48px;
-    }
-
-    h1 {
-      max-width: 1040px;
-      margin: 0 0 10px;
-      font-size: clamp(1.55rem, 2.6vw, 2.35rem);
-      line-height: 1.12;
-      letter-spacing: 0;
-    }
-
-    h2 {
-      margin: 28px 0 14px;
-      font-size: 1.25rem;
-    }
-
-    p {
-      max-width: 980px;
-      color: var(--muted);
-      margin: 0;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(150px, 1fr));
-      gap: 12px;
-      margin: 22px 0;
-    }
-
-    .metric {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      padding: 14px 16px;
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 1.45rem;
-      color: var(--blue);
-    }
-
-    .metric span {
-      display: block;
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .filters {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 10px;
-      margin: 16px 0 18px;
-    }
-
-    input, select, button {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      padding: 10px 11px;
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-      background: var(--ink);
-      color: #fff;
-      border-color: var(--ink);
-    }
-
-    .figure-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 16px;
-    }
-
-    figure {
-      margin: 0;
-      background: #fff;
-      border: 1px solid var(--line);
-      padding: 10px;
-    }
-
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: Georgia, "Times New Roman", serif; line-height: 1.45; }
+    header { background: #fff; border-bottom: 1px solid var(--line); padding: 30px 34px 24px; }
+    main { width: min(1340px, calc(100% - 36px)); margin: 0 auto; padding: 24px 0 52px; }
+    h1 { max-width: 1120px; margin: 0 0 10px; font-size: clamp(1.55rem, 2.4vw, 2.35rem); line-height: 1.14; letter-spacing: 0; }
+    h2 { margin: 30px 0 12px; font-size: 1.28rem; }
+    h3 { margin: 0 0 8px; font-size: 1rem; }
+    p { max-width: 1040px; margin: 0; color: var(--muted); }
+    .summary { display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr)); gap: 12px; margin: 0 0 22px; }
+    .metric, .panel, .rec-card, figure { background: var(--panel); border: 1px solid var(--line); }
+    .metric { padding: 14px 16px; }
+    .metric strong { display: block; font-size: 1.45rem; color: var(--accent); }
+    .metric span { display: block; margin-top: 3px; color: var(--muted); font-size: 0.9rem; }
+    .explain-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+    .panel { padding: 16px; }
+    .filters { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; margin: 16px 0; }
+    .selector { display: grid; grid-template-columns: 1.6fr 0.8fr; gap: 10px; margin: 16px 0; }
+    input, select, button { width: 100%; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 10px 11px; font: inherit; }
+    button { cursor: pointer; background: var(--ink); color: #fff; border-color: var(--ink); }
+    .rec-list { display: grid; gap: 14px; margin-top: 14px; }
+    .rec-card { display: grid; grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr); gap: 14px; padding: 16px; align-items: stretch; }
+    .asset { border: 1px solid var(--line); padding: 12px; background: #fcfcfb; }
+    .asset.patent { border-left: 5px solid var(--patent); }
+    .asset.software { border-left: 5px solid var(--software); }
+    .asset small, .why small { display: block; color: var(--muted); margin-bottom: 5px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .asset strong { display: block; font-size: 0.98rem; margin-bottom: 8px; }
+    .asset p { color: var(--ink); font-size: 0.95rem; }
+    .score-box { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 1px solid var(--line); background: var(--soft); padding: 10px; }
+    .score-box strong { display: block; color: var(--accent); font-size: 1.55rem; line-height: 1; }
+    .score-box span { display: block; margin-top: 7px; color: var(--muted); font-size: 0.82rem; }
+    .why { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 12px; }
+    .pill { display: inline-block; border: 1px solid var(--line); padding: 2px 7px; margin: 0 4px 5px 0; font-size: 0.82rem; color: var(--muted); background: #fafafa; }
+    .pill.good { color: #173c2d; border-color: #b9cec3; background: #eef6f1; }
+    .network-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; margin-top: 14px; }
+    #network { width: 100%; height: 560px; background: #fff; border: 1px solid var(--line); }
+    .detail { min-height: 560px; padding: 16px; background: #fff; border: 1px solid var(--line); }
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0 0; color: var(--muted); font-size: 0.92rem; }
+    .dot { display: inline-block; width: 11px; height: 11px; border-radius: 999px; margin-right: 5px; vertical-align: -1px; }
+    .table-wrap { overflow: auto; background: #fff; border: 1px solid var(--line); margin-top: 14px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1180px; font-size: 0.9rem; }
+    th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; vertical-align: top; }
+    th { position: sticky; top: 0; background: #f3f5f4; text-align: left; z-index: 1; }
+    td.score { font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .figure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 16px; }
+    figure { margin: 0; padding: 10px; }
     figure.wide { grid-column: 1 / -1; }
-
-    figure img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    figcaption {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 8px;
-      text-align: center;
-    }
-
-    .table-wrap {
-      overflow: auto;
-      background: #fff;
-      border: 1px solid var(--line);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1120px;
-      font-size: 0.92rem;
-    }
-
-    th, td {
-      border-bottom: 1px solid var(--line);
-      padding: 9px 10px;
-      vertical-align: top;
-    }
-
-    th {
-      position: sticky;
-      top: 0;
-      background: #f3f5f4;
-      text-align: left;
-      z-index: 1;
-    }
-
-    td.score {
-      font-weight: 700;
-      color: var(--blue);
-      white-space: nowrap;
-    }
-
-    .pill {
-      display: inline-block;
-      border: 1px solid var(--line);
-      padding: 2px 7px;
-      margin: 0 4px 4px 0;
-      font-size: 0.82rem;
-      color: var(--muted);
-      background: #fafafa;
-    }
-
-    .note {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    @media (max-width: 900px) {
+    figure img { width: 100%; height: auto; display: block; }
+    figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 8px; text-align: center; }
+    .note { margin-top: 10px; color: var(--muted); font-size: 0.92rem; }
+    @media (max-width: 980px) {
       header { padding: 22px 18px; }
-      main { padding: 18px; }
-      .summary, .filters, .figure-grid {
-        grid-template-columns: 1fr;
-      }
+      main { width: min(100% - 24px, 760px); }
+      .summary, .explain-grid, .filters, .selector, .network-layout, .figure-grid { grid-template-columns: 1fr; }
+      .rec-card { grid-template-columns: 1fr; }
+      .detail { min-height: auto; }
+      #network { height: 520px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Recomendações de complementaridades tecnológicas entre patentes e programas de computador</h1>
-    <p>
-      Painel de consulta dos pares patente-software gerados pelo experimento com
-      microdados BADEPI 11.0. As recomendações indicam complementaridades potenciais,
-      não transferência tecnológica realizada.
-    </p>
+    <h1>Sistema de recomendação de complementaridades tecnológicas entre patentes e programas de computador</h1>
+    <p>Selecione uma patente e veja quais softwares foram recomendados, qual é o escore e quais evidências explicam a ligação. A saída indica complementaridade potencial para triagem por NITs.</p>
   </header>
 
   <main>
@@ -213,24 +92,55 @@
     </section>
 
     <section>
-      <h2>Tabela de Recomendações</h2>
-      <p>
-        Cada linha apresenta uma patente, um programa de computador e os indicadores
-        usados para ranquear a complementaridade: escore composto, similaridade textual,
-        área, tópico, vínculo institucional e distância temporal.
-      </p>
+      <h2>Como o sistema recomenda</h2>
+      <p>A recomendação é o par patente--software ordenado pelo escore composto. O painel mostra a patente, o software recomendado e a justificativa computacional da complementaridade.</p>
+      <div class="explain-grid">
+        <div class="panel"><h3>Patente de entrada</h3><p>Invenção, processo, equipamento, sensor, método ou kit registrado por uma ICT.</p></div>
+        <div class="panel"><h3>Software sugerido</h3><p>Programa que pode complementar a patente por diagnóstico, controle, medição, gestão, ensino, simulação ou aplicação digital.</p></div>
+        <div class="panel"><h3>Motivo da ligação</h3><p>Mesma área, mesmo tópico, mesma ICT, similaridade textual, Jaccard e distância temporal explicam a sugestão.</p></div>
+      </div>
+    </section>
 
+    <section>
+      <h2>Recomendar softwares para uma patente</h2>
+      <p>Esta é a parte principal do sistema. Ao escolher uma patente, o painel apresenta os softwares mais bem ranqueados e a explicação de cada complementaridade.</p>
+      <div class="selector">
+        <select id="patentSelect"><option value="">Selecione uma patente</option></select>
+        <select id="topN">
+          <option value="5">Top 5 recomendações</option>
+          <option value="10" selected>Top 10 recomendações</option>
+          <option value="20">Top 20 recomendações</option>
+        </select>
+      </div>
+      <div class="rec-list" id="recommendationCards"></div>
+    </section>
+
+    <section>
+      <h2>Rede interativa das principais recomendações</h2>
+      <p>Patentes aparecem em azul escuro e softwares em marrom. Clique em uma linha para identificar o par e ver os indicadores da complementaridade. A linha mais espessa indica maior escore.</p>
+      <div class="legend">
+        <span><i class="dot" style="background: var(--patent)"></i>Patente</span>
+        <span><i class="dot" style="background: var(--software)"></i>Programa de computador</span>
+        <span>Linha mais espessa = maior escore</span>
+      </div>
+      <div class="network-layout">
+        <svg id="network" role="img" aria-label="Rede interativa de recomendações"></svg>
+        <aside class="detail" id="networkDetail">
+          <h3>Detalhe da recomendação</h3>
+          <p>Clique em uma ligação da rede para ver a patente, o software e os indicadores usados na recomendação.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tabela completa de recomendações</h2>
+      <p>Use os filtros para consultar os pares. A coluna de complementaridade descreve por que aquele software foi sugerido para aquela patente.</p>
       <div class="filters">
         <input id="q" type="search" placeholder="Buscar por título, ICT, área ou número do pedido">
-        <select id="area">
-          <option value="">Todas as áreas</option>
-        </select>
-        <select id="ict">
-          <option value="">Todas as ICTs</option>
-        </select>
+        <select id="area"><option value="">Todas as áreas</option></select>
+        <select id="ict"><option value="">Todas as ICTs</option></select>
         <button id="clear" type="button">Limpar filtros</button>
       </div>
-
       <div class="table-wrap">
         <table>
           <thead>
@@ -238,9 +148,9 @@
               <th>Escore</th>
               <th>Patente</th>
               <th>Programa de computador</th>
+              <th>Complementaridade sugerida</th>
               <th>ICT da patente</th>
               <th>ICT do software</th>
-              <th>Área</th>
               <th>Indicadores</th>
             </tr>
           </thead>
@@ -251,28 +161,13 @@
     </section>
 
     <section>
-      <h2>Figuras do Experimento</h2>
+      <h2>Figuras do experimento</h2>
       <div class="figure-grid">
-        <figure class="wide">
-          <img src="fig_01_evolucao_anual.png" alt="Evolução anual dos ativos">
-          <figcaption>Evolução anual dos ativos de ICTs identificados.</figcaption>
-        </figure>
-        <figure>
-          <img src="fig_02_areas_lexicas.png" alt="Áreas de aplicação inferidas">
-          <figcaption>Áreas de aplicação inferidas por léxico tecnológico.</figcaption>
-        </figure>
-        <figure>
-          <img src="fig_03_metricas_modelos.png" alt="Métricas dos modelos">
-          <figcaption>Desempenho dos melhores modelos por Average Precision.</figcaption>
-        </figure>
-        <figure>
-          <img src="fig_04_distribuicao_scores.png" alt="Distribuição dos escores">
-          <figcaption>Distribuição dos escores compostos de recomendação.</figcaption>
-        </figure>
-        <figure>
-          <img src="fig_05_rede_recomendacoes.png" alt="Rede de recomendações">
-          <figcaption>Rede das principais complementaridades recomendadas.</figcaption>
-        </figure>
+        <figure class="wide"><img src="fig_01_evolucao_anual.png" alt="Evolução anual dos ativos"><figcaption>Evolução anual dos ativos de ICTs identificados.</figcaption></figure>
+        <figure><img src="fig_02_areas_lexicas.png" alt="Áreas de aplicação inferidas"><figcaption>Áreas de aplicação inferidas por léxico tecnológico.</figcaption></figure>
+        <figure><img src="fig_03_metricas_modelos.png" alt="Métricas dos modelos"><figcaption>Desempenho dos melhores modelos por Average Precision.</figcaption></figure>
+        <figure><img src="fig_04_distribuicao_scores.png" alt="Distribuição dos escores"><figcaption>Distribuição dos escores compostos de recomendação.</figcaption></figure>
+        <figure><img src="fig_05_rede_recomendacoes.png" alt="Rede estática de recomendações"><figcaption>Rede estática gerada no experimento original.</figcaption></figure>
       </div>
     </section>
   </main>
@@ -284,36 +179,26 @@
     const qEl = document.getElementById("q");
     const areaEl = document.getElementById("area");
     const ictEl = document.getElementById("ict");
+    const patentSelect = document.getElementById("patentSelect");
+    const topN = document.getElementById("topN");
+    const cardsEl = document.getElementById("recommendationCards");
+    const networkEl = document.getElementById("network");
+    const networkDetail = document.getElementById("networkDetail");
 
     function parseCSV(text) {
       const rows = [];
       let row = [], field = "", quoted = false;
       for (let i = 0; i < text.length; i++) {
         const ch = text[i], next = text[i + 1];
-        if (ch === '"' && quoted && next === '"') {
-          field += '"';
-          i++;
-        } else if (ch === '"') {
-          quoted = !quoted;
-        } else if (ch === "," && !quoted) {
-          row.push(field);
-          field = "";
-        } else if ((ch === "\n" || ch === "\r") && !quoted) {
-          if (field || row.length) {
-            row.push(field);
-            rows.push(row);
-            row = [];
-            field = "";
-          }
+        if (ch === '"' && quoted && next === '"') { field += '"'; i++; }
+        else if (ch === '"') quoted = !quoted;
+        else if (ch === "," && !quoted) { row.push(field); field = ""; }
+        else if ((ch === "\n" || ch === "\r") && !quoted) {
+          if (field || row.length) { row.push(field); rows.push(row); row = []; field = ""; }
           if (ch === "\r" && next === "\n") i++;
-        } else {
-          field += ch;
-        }
+        } else field += ch;
       }
-      if (field || row.length) {
-        row.push(field);
-        rows.push(row);
-      }
+      if (field || row.length) { row.push(field); rows.push(row); }
       const header = rows.shift();
       return rows.map(values => Object.fromEntries(header.map((h, i) => [h, values[i] || ""])));
     }
@@ -323,83 +208,192 @@
       return Number.isFinite(n) ? n.toFixed(digits).replace(".", ",") : "";
     }
 
-    function normalize(value) {
+    function normalizeText(value) {
       return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    function populateFilters() {
-      const areas = [...new Set(state.data.map(d => d.patente_area_lexica).filter(Boolean))].sort();
-      const icts = [...new Set([
-        ...state.data.map(d => d.patente_depositante),
-        ...state.data.map(d => d.software_depositante)
-      ].filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    function shortText(value, size = 64) {
+      const text = String(value || "").trim();
+      return text.length > size ? text.slice(0, size - 1) + "..." : text;
+    }
 
+    function areaLabel(value) {
+      return String(value || "geral").replaceAll("_", " ");
+    }
+
+    function complementarityText(d) {
+      const parts = [];
+      if (d.mesma_area_lexica === "1") parts.push(`mesma área inferida (${areaLabel(d.patente_area_lexica)})`);
+      if (d.mesmo_topico === "1") parts.push("mesmo agrupamento tecnológico");
+      if (d.mesma_ict === "1") parts.push("mesma ICT depositante");
+      const years = Number(d.dist_ano);
+      if (Number.isFinite(years)) parts.push(`distância temporal de ${years.toFixed(0)} ano(s)`);
+      parts.push(`similaridade textual ${fmtNumber(d.cosine)}`);
+      return parts.join("; ") + ".";
+    }
+
+    function indicatorPills(d) {
+      return [
+        `modelo: ${fmtNumber(d.score_modelo)}`,
+        `cosseno: ${fmtNumber(d.cosine)}`,
+        `jaccard: ${fmtNumber(d.jaccard_texto)}`,
+        d.mesma_ict === "1" ? "mesma ICT" : "ICTs distintas",
+        d.mesma_area_lexica === "1" ? "mesma área" : "áreas distintas/geral",
+        d.mesmo_topico === "1" ? "mesmo tópico" : "tópicos distintos",
+        `anos: ${fmtNumber(d.dist_ano, 0)}`
+      ].map(x => `<span class="pill ${x.startsWith("mesma") ? "good" : ""}">${x}</span>`).join("");
+    }
+
+    function populateFilters() {
+      const areas = [...new Set(state.data.flatMap(d => [d.patente_area_lexica, d.software_area_lexica]).filter(Boolean))].sort();
+      const icts = [...new Set([...state.data.map(d => d.patente_depositante), ...state.data.map(d => d.software_depositante)].filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      const patents = [...new Map(state.data.map(d => [d.patente_NO_PEDIDO.trim(), `${d.patente_NO_PEDIDO.trim()} - ${shortText(d.patente_titulo, 90)}`])).entries()];
       for (const area of areas) {
         const opt = document.createElement("option");
-        opt.value = area;
-        opt.textContent = area.replaceAll("_", " ");
-        areaEl.appendChild(opt);
+        opt.value = area; opt.textContent = areaLabel(area); areaEl.appendChild(opt);
       }
-
-      for (const ict of icts.slice(0, 250)) {
+      for (const ict of icts.slice(0, 300)) {
         const opt = document.createElement("option");
-        opt.value = ict;
-        opt.textContent = ict;
-        ictEl.appendChild(opt);
+        opt.value = ict; opt.textContent = ict; ictEl.appendChild(opt);
+      }
+      for (const [id, label] of patents) {
+        const opt = document.createElement("option");
+        opt.value = id; opt.textContent = label; patentSelect.appendChild(opt);
+      }
+      if (patents.length) patentSelect.value = patents[0][0];
+    }
+
+    function renderRecommendationCards() {
+      const patent = patentSelect.value;
+      const n = Number(topN.value);
+      const selected = state.data.filter(d => d.patente_NO_PEDIDO.trim() === patent).slice(0, n);
+      cardsEl.innerHTML = "";
+      if (!selected.length) {
+        cardsEl.innerHTML = '<div class="panel"><p>Selecione uma patente para ver os softwares recomendados.</p></div>';
+        return;
+      }
+      for (const d of selected) {
+        const article = document.createElement("article");
+        article.className = "rec-card";
+        article.innerHTML = `
+          <div class="asset patent">
+            <small>Patente ${d.patente_NO_PEDIDO.trim()} - ${d.patente_ano}</small>
+            <strong>${d.patente_depositante}</strong>
+            <p>${d.patente_titulo}</p>
+          </div>
+          <div class="score-box">
+            <strong>${fmtNumber(d.score_recomendacao)}</strong>
+            <span>escore de recomendação</span>
+          </div>
+          <div class="asset software">
+            <small>Software ${d.software_NO_PEDIDO.trim()} - ${d.software_ano}</small>
+            <strong>${d.software_depositante}</strong>
+            <p>${d.software_titulo}</p>
+          </div>
+          <div class="why">
+            <small>Por que este par foi recomendado?</small>
+            <p>${complementarityText(d)}</p>
+            <div style="margin-top:8px">${indicatorPills(d)}</div>
+          </div>`;
+        cardsEl.appendChild(article);
       }
     }
 
     function applyFilters() {
-      const q = normalize(qEl.value);
+      const q = normalizeText(qEl.value);
       const area = areaEl.value;
       const ict = ictEl.value;
-
       state.filtered = state.data.filter(d => {
-        const haystack = normalize([
-          d.patente_NO_PEDIDO,
-          d.software_NO_PEDIDO,
-          d.patente_titulo,
-          d.software_titulo,
-          d.patente_depositante,
-          d.software_depositante,
-          d.patente_area_lexica,
-          d.software_area_lexica
-        ].join(" "));
-        const matchQ = !q || haystack.includes(q);
-        const matchArea = !area || d.patente_area_lexica === area || d.software_area_lexica === area;
-        const matchIct = !ict || d.patente_depositante === ict || d.software_depositante === ict;
-        return matchQ && matchArea && matchIct;
+        const haystack = normalizeText([d.patente_NO_PEDIDO, d.software_NO_PEDIDO, d.patente_titulo, d.software_titulo, d.patente_depositante, d.software_depositante, d.patente_area_lexica, d.software_area_lexica].join(" "));
+        return (!q || haystack.includes(q)) &&
+          (!area || d.patente_area_lexica === area || d.software_area_lexica === area) &&
+          (!ict || d.patente_depositante === ict || d.software_depositante === ict);
       });
-
       renderRows();
     }
 
     function renderRows() {
       const fragment = document.createDocumentFragment();
       rowsEl.innerHTML = "";
-      for (const d of state.filtered.slice(0, 150)) {
+      for (const d of state.filtered.slice(0, 180)) {
         const tr = document.createElement("tr");
-        const indicators = [
-          `modelo: ${fmtNumber(d.score_modelo)}`,
-          `cosseno: ${fmtNumber(d.cosine)}`,
-          `jaccard: ${fmtNumber(d.jaccard_texto)}`,
-          d.mesma_ict === "1" ? "mesma ICT" : "ICTs distintas",
-          d.mesmo_topico === "1" ? "mesmo tópico" : "tópicos distintos",
-          `anos: ${fmtNumber(d.dist_ano, 0)}`
-        ];
         tr.innerHTML = `
           <td class="score">${fmtNumber(d.score_recomendacao)}</td>
           <td><strong>${d.patente_NO_PEDIDO.trim()}</strong><br>${d.patente_titulo}</td>
           <td><strong>${d.software_NO_PEDIDO.trim()}</strong><br>${d.software_titulo}</td>
+          <td>${complementarityText(d)}</td>
           <td>${d.patente_depositante}</td>
           <td>${d.software_depositante}</td>
-          <td>${(d.patente_area_lexica || "").replaceAll("_", " ")}<br>${(d.software_area_lexica || "").replaceAll("_", " ")}</td>
-          <td>${indicators.map(x => `<span class="pill">${x}</span>`).join("")}</td>
-        `;
+          <td>${indicatorPills(d)}</td>`;
         fragment.appendChild(tr);
       }
       rowsEl.appendChild(fragment);
-      countEl.textContent = `${state.filtered.length} recomendações encontradas. Exibindo até 150 linhas para manter a página leve.`;
+      countEl.textContent = `${state.filtered.length} recomendações encontradas. Exibindo até 180 linhas para manter a página leve.`;
+    }
+
+    function nodeId(prefix, value) { return `${prefix}:${String(value || "").trim()}`; }
+
+    function renderNetwork() {
+      const width = networkEl.clientWidth || 900;
+      const height = networkEl.clientHeight || 560;
+      networkEl.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      networkEl.innerHTML = "";
+      const links = state.data.slice(0, 36);
+      const nodes = new Map();
+      for (const d of links) {
+        const pId = nodeId("P", d.patente_NO_PEDIDO);
+        const sId = nodeId("S", d.software_NO_PEDIDO);
+        if (!nodes.has(pId)) nodes.set(pId, { id: pId, type: "patente", label: d.patente_NO_PEDIDO.trim(), title: d.patente_titulo });
+        if (!nodes.has(sId)) nodes.set(sId, { id: sId, type: "software", label: d.software_NO_PEDIDO.trim(), title: d.software_titulo });
+      }
+      const nodeArray = [...nodes.values()];
+      const patentNodes = nodeArray.filter(n => n.type === "patente");
+      const softwareNodes = nodeArray.filter(n => n.type === "software");
+      patentNodes.forEach((n, i) => { n.x = width * 0.30; n.y = 42 + i * ((height - 84) / Math.max(1, patentNodes.length - 1)); });
+      softwareNodes.forEach((n, i) => { n.x = width * 0.72; n.y = 42 + i * ((height - 84) / Math.max(1, softwareNodes.length - 1)); });
+      const byId = Object.fromEntries(nodeArray.map(n => [n.id, n]));
+      const maxScore = Math.max(...links.map(d => Number(d.score_recomendacao)));
+      const minScore = Math.min(...links.map(d => Number(d.score_recomendacao)));
+      for (const d of links) {
+        const p = byId[nodeId("P", d.patente_NO_PEDIDO)];
+        const s = byId[nodeId("S", d.software_NO_PEDIDO)];
+        const score = Number(d.score_recomendacao);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", p.x); line.setAttribute("y1", p.y);
+        line.setAttribute("x2", s.x); line.setAttribute("y2", s.y);
+        line.setAttribute("stroke", "#9fa6a8");
+        line.setAttribute("stroke-width", String(1.2 + 5 * ((score - minScore) / Math.max(0.001, maxScore - minScore))));
+        line.setAttribute("opacity", "0.55");
+        line.style.cursor = "pointer";
+        line.addEventListener("click", () => showNetworkDetail(d));
+        networkEl.appendChild(line);
+      }
+      for (const n of nodeArray) {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", n.x); circle.setAttribute("cy", n.y); circle.setAttribute("r", "8");
+        circle.setAttribute("fill", n.type === "patente" ? "#183940" : "#a98467");
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", n.type === "patente" ? n.x - 14 : n.x + 14);
+        text.setAttribute("y", n.y + 4);
+        text.setAttribute("text-anchor", n.type === "patente" ? "end" : "start");
+        text.setAttribute("font-size", "11");
+        text.setAttribute("fill", "#1f2d2f");
+        text.textContent = n.label;
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `${n.type === "patente" ? "Patente" : "Software"} ${n.label}: ${n.title}`;
+        g.append(circle, text, title);
+        networkEl.appendChild(g);
+      }
+    }
+
+    function showNetworkDetail(d) {
+      networkDetail.innerHTML = `
+        <h3>Complementaridade recomendada</h3>
+        <p><b>Patente ${d.patente_NO_PEDIDO.trim()}</b><br>${d.patente_titulo}</p>
+        <p style="margin-top:12px"><b>Software ${d.software_NO_PEDIDO.trim()}</b><br>${d.software_titulo}</p>
+        <p style="margin-top:12px"><b>Interpretação:</b> ${complementarityText(d)}</p>
+        <div style="margin-top:12px">${indicatorPills(d)}</div>`;
     }
 
     fetch("recomendacoes_topk.csv")
@@ -407,15 +401,16 @@
       .then(text => {
         state.data = parseCSV(text).sort((a, b) => Number(b.score_recomendacao) - Number(a.score_recomendacao));
         populateFilters();
+        renderRecommendationCards();
         applyFilters();
+        renderNetwork();
+        window.addEventListener("resize", renderNetwork);
       });
 
     [qEl, areaEl, ictEl].forEach(el => el.addEventListener("input", applyFilters));
+    [patentSelect, topN].forEach(el => el.addEventListener("input", renderRecommendationCards));
     document.getElementById("clear").addEventListener("click", () => {
-      qEl.value = "";
-      areaEl.value = "";
-      ictEl.value = "";
-      applyFilters();
+      qEl.value = ""; areaEl.value = ""; ictEl.value = ""; applyFilters();
     });
   </script>
 </body>
